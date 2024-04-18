@@ -41,9 +41,10 @@ object ConferenceReviewing:
           scores.sum.doubleValue / scores.size
 
         override def acceptedArticles(): Set[Int] =
-          reviews.filter(_._2(Question.RELEVANCE) >= 8).filter(a => averageFinalScore(a._1) > 5).map(i => i._1).toSet
+          reviews.filter(a => a._2(Question.RELEVANCE) >= 8 && averageFinalScore(a._1) > 5).map(i => i._1).toSet
+
         override def sortedAcceptedArticles(): List[(Int, Double)] =
           val acceptedArticles = this.acceptedArticles()
           reviews.filter(a => acceptedArticles.contains(a._1)).map(a => (a._1, averageFinalScore(a._1))).distinct.sortBy(_._2)
         override def averageWeightedFinalScoreMap(): Map[Int, Double] =
-          reviews.map(i => (i._1, (averageScore(i._1, CONFIDENCE) * averageFinalScore(i._1)) / 10.0)).toMap
+          reviews.map(i => (i._1, (averageScore(i._1, CONFIDENCE) * averageFinalScore(i._1)) / (reviews.size - 1))).toMap
